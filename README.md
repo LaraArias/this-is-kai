@@ -207,10 +207,10 @@ Then the same prompt went to Kimi, recorded through the interface with the offic
 
 | Run | Temperature | Finished | Recorded time | 429s | Model calls | Generation | Mean TPS | Per call |
 |---|---:|---|---:|---:|---:|---:|---:|---|
-| `catalog-kimi-recorded-001` | 1 | yes | 16.6 s | not recorded | 3 | 0.82 s | 865.1 | 738 / 1,123 / 734 |
-| `catalog-kimi-recorded-002` | 1 | no | 162.8 s | not recorded | 1 | | | 1,012 |
+| `catalog-kimi-recorded-001` | 1 | yes | 16.6 s | 1 | 3 | 0.82 s | 865.1 | 738 / 1,123 / 734 |
+| `catalog-kimi-recorded-002` | 1 | no | 162.8 s | 10 | 1 | | | 1,012 |
 | `catalog-kimi-recorded-003` | 1 | yes | 20.7 s | 2 | 3 | 1.03 s | 762.8 | 476 / 1,126 / 687 |
-| `catalog-kimi-recorded-004` | 1 | yes | 36.7 s | not recorded | 3 | 0.68 s | 863.2 | 479 / 1,363 / 748 |
+| `catalog-kimi-recorded-004` | 1 | yes | 36.7 s | 4 | 3 | 0.68 s | 863.2 | 479 / 1,363 / 748 |
 | `catalog-temp0-001` | 0 | yes | 118.7 s | 7 | 3 | 0.83 s | 1,002.4 | 638 / 909 / 1,461 |
 | `catalog-temp0-002` | 0 | yes | 118.7 s | 7 | 3 | 0.94 s | 794.8 | 516 / 998 / 870 |
 
@@ -218,9 +218,9 @@ Every finished run made exactly three model calls and six fetches, and its five 
 
 What this did and did not change:
 
-- **The task got short and predictable.** The runs that were not held in the queue took 17 to 37 seconds, always in three calls. The browsing runs ranged from 17 seconds to almost ten minutes. Under a second of each catalog run is the model writing.
+- **The task got short and predictable.** The runs with at most four rejected requests took 17 to 37 seconds, always in three calls. The browsing runs ranged from 17 seconds to almost ten minutes. Under a second of each catalog run is the model writing.
 - **The score did not move.** 763 to 865 at temperature 1 is where the browsing runs already were. Temperature 0 gave 1,002 once and 795 the second time, so that is noise until shown otherwise.
-- **The queue still decides the clock.** The same three calls took 17 seconds without rejections and 119 seconds with seven.
+- **The queue still decides the clock.** The same three calls took 17 seconds with one rejected request, 37 with four and 119 with seven.
 
 The same prompt, agent and configuration were also pointed at the same model on two other providers, whose keys happened to be on the machine. Whole process, start to finish, from the command line: Nebius 42.8, 43.0 and 46.3 seconds; NVIDIA 167.9 and 177.8 seconds; Cerebras 38.3 seconds in a run that was rejected four times before it completed, with 1.14 seconds of generation. The five products were identical in all six. A single direct streaming request, timed on the client, wrote at 58 to 109 tokens per second on Nebius and 6 to 8 on NVIDIA; Cerebras rejected all three attempts, so there is no client-side figure for it. **Open:** A clean command-line run on Cerebras, to compare like with like: the 16.6-second run was recorded through the interface.
 
@@ -250,4 +250,4 @@ The raw run folders (config, per-call metrics, product verification, recordings)
 
 ## The video
 
-[`video/this-is-kai.mp4`](video/this-is-kai.mp4) is the 59-second demo. Its interface is redrawn and the on-screen prompt is shortened; the two timings in its split screen are the 16.6-second recorded Cerebras run and the 43.0-second Nebius run from the section above. The purchase and the delivery are staged: the agent finds and checks gifts, it does not buy them. The people, voice and music are generated.
+[`video/this-is-kai.mp4`](video/this-is-kai.mp4) is the 59-second demo. Its interface is redrawn and the on-screen prompt is shortened; the two timings in its split screen are the 16.6-second recorded Cerebras run (the fastest of three) and the 43.0-second Nebius run from the section above. The purchase and the delivery are staged: the agent finds and checks gifts, it does not buy them. The people, voice and music are generated.
