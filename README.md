@@ -250,4 +250,4 @@ The raw run folders (config, per-call metrics, product verification, recordings)
 
 ## The video
 
-[`video/this-is-kai.mp4`](video/this-is-kai.mp4) is the 53-second demo. Its interface is redrawn and the on-screen prompt is shortened; the two timings in its split screen are the 16.6-second recorded Cerebras run and the 43.0-second Nebius run from the section above. The purchase and the delivery are staged: the agent finds and checks gifts, it does not buy them. The people, voice and music are generated.
+[`video/this-is-kai.mp4`](video/this-is-kai.mp4) is the 59-second demo. Its interface is redrawn and the on-screen prompt is shortened; the two timings in its split screen are the 16.6-second recorded Cerebras run and the 43.0-second Nebius run from the section above. The purchase and the delivery are staged: the agent finds and checks gifts, it does not buy them. The people, voice and music are generated.
