@@ -1,6 +1,6 @@
 # The model wrote for 6.6 seconds. The run took 6 minutes.
 
-> Written during the Cerebras × Kimi K3.1 Pro × OpenClaw hackathon, November 21–22, 2026. Every number comes from our own saved runs (thirty-four agent runs, six recorded catalog runs, direct API calls, one extraction prototype, rehearsals on another model and the same model on two other providers) or from what other participants posted in the Cerebras Discord, and is labeled as such. **Open:** marks something we did not get to measure. Nothing here is a demonstrated improvement. This post is still being edited.
+> Written during the Cerebras × Kimi K3.1 Pro × OpenClaw hackathon, November 21–22, 2026. Every number comes from our own saved runs (thirty-four agent runs, seven recorded catalog runs, direct API calls, one extraction prototype, rehearsals on another model and the same model on two other providers) or from what other participants posted in the Cerebras Discord, and is labeled as such. **Open:** marks something we did not get to measure. Nothing here is a demonstrated improvement. This post is still being edited.
 
 We asked an OpenClaw agent running Kimi K3.1 Pro on Cerebras to find five real Christmas gifts on real shopping sites. It did: five Barnes & Noble product pages, each one opened and checked.
 
@@ -203,7 +203,7 @@ The extraction prototype pointed at one change we had not tried inside the agent
 
 Kimi was answering almost every request with a 429 that night, so the shape was rehearsed first on another model on the same endpoint (`qwen-3.8-27b`, fourteen runs, never a bounty number). With the store named, eight of eight runs finished in 2 or 3 model calls and 10.6 to 12.8 seconds. With no store named, four of six finished, in 5 to 17 calls and 19 to 68 seconds; one ran 59 turns into the time limit.
 
-Then the same prompt went to Kimi, recorded through the interface with the official patch. Six runs, all listed:
+Then the same prompt went to Kimi, recorded through the interface with the official patch. Seven runs, all listed:
 
 | Run | Temperature | Finished | Recorded time | 429s | Model calls | Generation | Mean TPS | Per call |
 |---|---:|---|---:|---:|---:|---:|---:|---|
@@ -213,14 +213,15 @@ Then the same prompt went to Kimi, recorded through the interface with the offic
 | `catalog-kimi-recorded-004` | 1 | yes | 36.7 s | 4 | 3 | 0.68 s | 863.2 | 479 / 1,363 / 748 |
 | `catalog-temp0-001` | 0 | yes | 118.7 s | 7 | 3 | 0.83 s | 1,002.4 | 638 / 909 / 1,461 |
 | `catalog-temp0-002` | 0 | yes | 118.7 s | 7 | 3 | 0.94 s | 794.8 | 516 / 998 / 870 |
+| `catalog-temp0-003` | 0 | yes | 24.7 s | 3 | 3 | 0.63 s | 1,125.6 | 703 / 1,262 / 1,412 |
 
 Every finished run made exactly three model calls and six fetches, and its five products were checked against the store's live product records.
 
 What this did and did not change:
 
 - **The task got short and predictable.** The runs with at most four rejected requests took 17 to 37 seconds, always in three calls. The browsing runs ranged from 17 seconds to almost ten minutes. Under a second of each catalog run is the model writing.
-- **The score did not move.** 763 to 865 at temperature 1 is where the browsing runs already were. Temperature 0 gave 1,002 once and 795 the second time, so that is noise until shown otherwise.
-- **The queue still decides the clock.** The same three calls took 17 seconds with one rejected request, 37 with four and 119 with seven.
+- **The score did not move.** 763 to 865 at temperature 1 is where the browsing runs already were. Temperature 0 gave 1,002, then 795, then 1,126. Three runs against three, with overlapping ranges: not a demonstrated effect.
+- **The queue still decides the clock.** The same three calls took 17 seconds with one rejected request, 25 with three, 37 with four and 119 with seven.
 
 The same prompt, agent and configuration were also pointed at the same model on two other providers, whose keys happened to be on the machine. Whole process, start to finish, from the command line: Nebius 42.8, 43.0 and 46.3 seconds; NVIDIA 167.9 and 177.8 seconds; Cerebras 38.3 seconds in a run that was rejected four times before it completed, with 1.14 seconds of generation. The five products were identical in all six. A single direct streaming request, timed on the client, wrote at 58 to 109 tokens per second on Nebius and 6 to 8 on NVIDIA; Cerebras rejected all three attempts, so there is no client-side figure for it. **Open:** A clean command-line run on Cerebras, to compare like with like: the 16.6-second run was recorded through the interface.
 
@@ -246,7 +247,13 @@ The prompts used in the catalog runs are in [`prompts/`](prompts/). `catalog-3ca
 
 Harness: OpenClaw at commit `8b18b55`, with the official Speed Bounty patch for the runs that report tokens per second. Model: `moonshotai-kimi-k3.1-pro-trial` at `https://api.cerebras.ai/v1`, thinking low, temperature 1 unless the table says otherwise, 4,096 max tokens.
 
-The raw run folders (config, per-call metrics, product verification, recordings) are not in this repository yet.
+What is in this repository:
+
+- [`data/runs.csv`](data/runs.csv) and [`data/calls.csv`](data/calls.csv): every agent run with its duration, score, rejected requests and status, and every model call with its output tokens, server-reported completion time and rate. Numbers only.
+- [`analysis/analyze.py`](analysis/analyze.py) and its output [`analysis/REPORT.md`](analysis/REPORT.md): a pandas pass over those files that shows where the rate differs (how the call ended, output length, position in the run, rejected requests, temperature). Run it with `python3 analysis/analyze.py`; it needs `pandas` and `tabulate`.
+- [`recordings/`](recordings/): unedited screen recordings of the five best runs.
+
+Configs, logs and transcripts of the runs are not published.
 
 ## The video
 
