@@ -41,7 +41,7 @@ overview = runs.groupby("family").agg(runs=("run", "count"), finished=("finished
                                       median_score=("mean_tps", "median"))
 section("1. What is in the data",
         f"{len(runs)} agent runs and {len(calls)} model calls, all Kimi K3.1 Pro on Cerebras through OpenClaw. "
-        "`browsing` runs let the agent find products by opening store pages; `catalog` runs name one store's live search endpoint in the prompt.",
+        "`browsing` runs let the agent find products by opening store pages; `catalog` runs write one store's live search URL into the prompt; `store-name` runs name the store and nothing else (no URL); `local-tool` runs use an experimental local tool with the store fixed in code.",
         overview)
 
 # 2. Tool calls against final answers

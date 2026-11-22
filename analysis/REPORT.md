@@ -6,12 +6,14 @@ Every rate here is server-reported (completion tokens over completion time) for 
 
 ## 1. What is in the data
 
-45 agent runs and 250 model calls, all Kimi K3.1 Pro on Cerebras through OpenClaw. `browsing` runs let the agent find products by opening store pages; `catalog` runs name one store's live search endpoint in the prompt.
+54 agent runs and 281 model calls, all Kimi K3.1 Pro on Cerebras through OpenClaw. `browsing` runs let the agent find products by opening store pages; `catalog` runs write one store's live search URL into the prompt; `store-name` runs name the store and nothing else (no URL); `local-tool` runs use an experimental local tool with the store fixed in code.
 
-| family   |   runs |   finished |   calls |   median_calls_per_run |   median_wall_s |   median_score |
-|:---------|-------:|-----------:|--------:|-----------------------:|----------------:|---------------:|
-| browsing |   38.0 |       30.0 |   231.0 |                    4.0 |           128.4 |          662.1 |
-| catalog  |    7.0 |        6.0 |    19.0 |                    3.0 |            36.7 |          865.1 |
+| family     |   runs |   finished |   calls |   median_calls_per_run |   median_wall_s |   median_score |
+|:-----------|-------:|-----------:|--------:|-----------------------:|----------------:|---------------:|
+| browsing   |   39.0 |       31.0 |   236.0 |                    4.0 |           141.4 |          669.1 |
+| catalog    |    8.0 |        7.0 |    21.0 |                    3.0 |            77.7 |          864.2 |
+| local-tool |    2.0 |        1.0 |     3.0 |                    1.5 |           141.8 |          696.1 |
+| store-name |    5.0 |        5.0 |    21.0 |                    4.0 |            60.7 |          549.6 |
 
 ## 2. Rate by how the call ended
 
@@ -19,8 +21,8 @@ Per-call rate by how the call ended.
 
 | kind         |   calls |   median |   mean |   p10 |    p90 |
 |:-------------|--------:|---------:|-------:|------:|-------:|
-| final answer |    36.0 |    532.1 |  572.8 | 370.4 |  784.7 |
-| tool call    |   214.0 |    684.2 |  709.1 | 373.4 | 1103.4 |
+| final answer |    44.0 |    532.1 |  575.5 | 374.1 |  799.5 |
+| tool call    |   237.0 |    677.0 |  701.1 | 367.8 | 1096.8 |
 
 ## 3. Rate by output length
 
@@ -28,13 +30,13 @@ Per-call rate by number of output tokens (reasoning tokens included).
 
 | tokens   |   calls |   median |   mean |   p10 |    p90 |
 |:---------|--------:|---------:|-------:|------:|-------:|
-| 61-120   |    71.0 |    768.3 |  813.2 | 501.6 | 1233.8 |
-| 121-250  |    75.0 |    567.8 |  599.9 | 326.1 |  931.4 |
-| 251-500  |    54.0 |    619.0 |  684.9 | 384.5 | 1115.3 |
+| 61-120   |    77.0 |    736.2 |  797.8 | 484.4 | 1177.8 |
+| 121-250  |    90.0 |    558.8 |  593.7 | 325.6 |  936.4 |
+| 251-500  |    64.0 |    619.0 |  686.9 | 382.5 | 1115.3 |
 | 501-1000 |    49.0 |    592.6 |  661.5 | 377.9 | 1055.1 |
 | 1001+    |     1.0 |    236.0 |  236.0 | 236.0 |  236.0 |
 
-Spearman correlation between output tokens and rate across all calls: -0.21.
+Spearman correlation between output tokens and rate across all calls: -0.18.
 
 ## 4. Length and kind are tangled
 
@@ -42,9 +44,9 @@ Median rate and number of calls for each combination. Empty cells have no calls.
 
 | tokens   |   ('median', 'final answer') |   ('median', 'tool call') |   ('count', 'final answer') |   ('count', 'tool call') |
 |:---------|-----------------------------:|--------------------------:|----------------------------:|-------------------------:|
-| 61-120   |                        nan   |                     768.3 |                       nan   |                     71.0 |
-| 121-250  |                        809.1 |                     524.9 |                         6.0 |                     69.0 |
-| 251-500  |                        541.0 |                     631.5 |                         8.0 |                     46.0 |
+| 61-120   |                        nan   |                     736.2 |                       nan   |                     77.0 |
+| 121-250  |                        734.2 |                     516.1 |                        11.0 |                     79.0 |
+| 251-500  |                        516.0 |                     651.5 |                        11.0 |                     53.0 |
 | 501-1000 |                        490.6 |                     855.7 |                        21.0 |                     28.0 |
 | 1001+    |                        236.0 |                     nan   |                         1.0 |                    nan   |
 
@@ -54,9 +56,9 @@ First call, last call, everything between.
 
 | where   |   calls |   median |   mean |   p10 |    p90 |
 |:--------|--------:|---------:|-------:|------:|-------:|
-| first   |    45.0 |    488.1 |  537.6 | 330.2 |  737.2 |
-| last    |    43.0 |    546.0 |  622.4 | 373.3 |  911.4 |
-| middle  |   162.0 |    726.5 |  749.4 | 379.2 | 1123.2 |
+| first   |    54.0 |    478.9 |  522.9 | 324.8 |  728.4 |
+| last    |    51.0 |    546.0 |  617.0 | 379.4 |  921.6 |
+| middle  |   176.0 |    726.7 |  748.7 | 400.7 | 1122.7 |
 
 ## 6. How much of the spread these labels describe
 
@@ -64,13 +66,13 @@ Ordinary least squares of per-call rate on four labels. It describes this sample
 
 |                    |   coefficient (tokens/s) |
 |:-------------------|-------------------------:|
-| intercept          |                    940.8 |
-| log(output tokens) |                    -67.2 |
-| is a tool call     |                    158.5 |
-| is the first call  |                   -271.9 |
-| is a catalog run   |                    317.7 |
+| intercept          |                    926.2 |
+| log(output tokens) |                    -64.5 |
+| is a tool call     |                    159.9 |
+| is the first call  |                   -278.9 |
+| is a catalog run   |                    287.0 |
 
-R² = 0.23: the labels account for about 23% of the variance between calls. The rest is not explained by anything recorded here.
+R² = 0.22: the labels account for about 22% of the variance between calls. The rest is not explained by anything recorded here.
 
 ## 7. The score is a mean of calls: the top runs
 
@@ -87,16 +89,18 @@ The eight highest-scoring finished runs. `mean_tps` is the official score; `toke
 | catalog-temp0-002         | catalog  |         3 |         0.67 |     794.85 |               814.97 |         118.75 |                 0.94 |
 | explicit-stop-004         | browsing |         4 |         0.75 |     775.48 |               785.05 |          52.59 |                 1.71 |
 
-Across the 36 finished runs, Spearman correlation of the score with the number of calls is -0.34, with the share of tool calls -0.34, and with how long the whole run took -0.21.
+Across the 44 finished runs, Spearman correlation of the score with the number of calls is -0.14, with the share of tool calls -0.14, and with how long the whole run took -0.22.
 
 ## 8. Where the time goes
 
 Finished runs. Generation is the summed server-reported completion time of all calls in the run.
 
-| family   |   runs |   median_wall_s |   min_wall_s |   max_wall_s |   median_generation_s |   median_generation_share |
-|:---------|-------:|----------------:|-------------:|-------------:|----------------------:|--------------------------:|
-| browsing |  30.00 |           68.15 |        16.79 |       581.68 |                  2.34 |                      3.21 |
-| catalog  |   6.00 |           30.69 |        16.64 |       118.75 |                  0.83 |                      2.20 |
+| family     |   runs |   median_wall_s |   min_wall_s |   max_wall_s |   median_generation_s |   median_generation_share |
+|:-----------|-------:|----------------:|-------------:|-------------:|----------------------:|--------------------------:|
+| browsing   |  31.00 |           70.60 |        16.79 |       581.68 |                  2.28 |                      3.17 |
+| catalog    |   7.00 |           36.70 |        16.64 |       184.85 |                  0.83 |                      1.84 |
+| local-tool |   1.00 |           46.69 |        46.69 |        46.69 |                  0.47 |                      1.00 |
+| store-name |   5.00 |           60.70 |        22.68 |       144.78 |                  1.83 |                      3.02 |
 
 ## 9. Catalog runs: rejected requests, the clock and the score
 
@@ -111,8 +115,9 @@ All catalog runs, same prompt. `http_429` counts rate-limit rejections logged du
 | catalog-temp0-001         |          0.00 | completed |          7 |         118.75 |         3 |                 0.83 |    1002.40 |
 | catalog-temp0-002         |          0.00 | completed |          7 |         118.75 |         3 |                 0.94 |     794.85 |
 | catalog-temp0-003         |          0.00 | completed |          3 |          24.68 |         3 |                 0.63 |    1125.61 |
+| catalog-two-turns-001     |          1.00 | completed |          9 |         184.85 |         2 |                 1.26 |     487.02 |
 
-Among the 6 that finished, Spearman correlation of rejections with whole-run time is 0.99 and with the score 0.06.
+Among the 7 that finished, Spearman correlation of rejections with whole-run time is 0.99 and with the score -0.34.
 
 ## 10. Temperature 0 against 1 on the catalog prompt
 
@@ -121,6 +126,6 @@ Finished catalog runs only.
 |   temperature |   runs |   min_score |   median_score |   max_score |
 |--------------:|-------:|------------:|---------------:|------------:|
 |           0.0 |    3.0 |       794.9 |         1002.4 |      1125.6 |
-|           1.0 |    3.0 |       762.8 |          863.2 |       865.1 |
+|           1.0 |    4.0 |       487.0 |          813.0 |       865.1 |
 
 The two ranges overlap. With this few runs there is no demonstrated effect.
